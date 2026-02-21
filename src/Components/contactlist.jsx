@@ -73,11 +73,11 @@ function ContactList() {
   };
 
   return (
-    <div>
+    <div className="container">
       <h2>📒 Lista de Contactos</h2>
 
       {/* 🔹 FORMULARIO */}
-      <div style={{ marginBottom: "20px" }}>
+      <div className="form-container">
         <input
           placeholder="Nombre"
           value={form.nombre}
