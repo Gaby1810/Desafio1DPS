@@ -10,76 +10,98 @@ function ContactList() {
     telefono: ""
   });
 
-  // 🔹 Leer contactos desde JSON (cuando este)
+  // 🔹 Leer contactos desde JSON al iniciar
   useEffect(() => {
     fetch("/contacts.json")
       .then(res => res.json())
       .then(data => {
+        // Ordenar favoritos al inicio
         data.sort((a, b) => b.favorito - a.favorito);
         setContacts(data);
       })
-      .catch(() => console.log("Esperando JSON..."));
+      .catch(() => console.log("Error cargando contacts.json"));
   }, []);
 
   // 🔹 Agregar contacto
   const addContact = () => {
-    if (!form.nombre || !form.apellido || !form.telefono) return;
+    if (!form.nombre || !form.apellido || !form.telefono) {
+      alert("Todos los campos son obligatorios");
+      return;
+    }
 
     const newContact = {
       id: Date.now(),
-      ...form,
+      nombre: form.nombre,
+      apellido: form.apellido,
+      telefono: form.telefono,
       favorito: false
     };
 
-    setContacts([...contacts, newContact]);
-    setForm({ nombre: "", apellido: "", telefono: "" });
+    const updatedContacts = [...contacts, newContact];
+
+    // Mantener favoritos al inicio
+    updatedContacts.sort((a, b) => b.favorito - a.favorito);
+
+    setContacts(updatedContacts);
+
+    // Limpiar formulario
+    setForm({
+      nombre: "",
+      apellido: "",
+      telefono: ""
+    });
   };
 
   // 🔹 Eliminar contacto
   const deleteContact = (id) => {
-    setContacts(contacts.filter(c => c.id !== id));
+    const updatedContacts = contacts.filter(c => c.id !== id);
+    setContacts(updatedContacts);
   };
 
   // 🔹 Agregar / quitar favorito
   const toggleFavorite = (id) => {
-    const updated = contacts.map(c =>
-      c.id === id ? { ...c, favorito: !c.favorito } : c
+    const updatedContacts = contacts.map(c =>
+      c.id === id
+        ? { ...c, favorito: !c.favorito }
+        : c
     );
 
-    // favoritos 
-    updated.sort((a, b) => b.favorito - a.favorito);
+    // Ordenar favoritos al inicio
+    updatedContacts.sort((a, b) => b.favorito - a.favorito);
 
-    setContacts(updated);
+    setContacts(updatedContacts);
   };
 
   return (
     <div>
-      <h2>Lista de Contactos</h2>
+      <h2>📒 Lista de Contactos</h2>
 
-      {/* FORMULARIO */}
-      <input
-        placeholder="Nombre"
-        value={form.nombre}
-        onChange={e => setForm({ ...form, nombre: e.target.value })}
-      />
+      {/* 🔹 FORMULARIO */}
+      <div style={{ marginBottom: "20px" }}>
+        <input
+          placeholder="Nombre"
+          value={form.nombre}
+          onChange={e => setForm({ ...form, nombre: e.target.value })}
+        />
 
-      <input
-        placeholder="Apellido"
-        value={form.apellido}
-        onChange={e => setForm({ ...form, apellido: e.target.value })}
-      />
+        <input
+          placeholder="Apellido"
+          value={form.apellido}
+          onChange={e => setForm({ ...form, apellido: e.target.value })}
+        />
 
-      <input
-        placeholder="Teléfono"
-        value={form.telefono}
-        onChange={e => setForm({ ...form, telefono: e.target.value })}
-      />
+        <input
+          placeholder="Teléfono"
+          value={form.telefono}
+          onChange={e => setForm({ ...form, telefono: e.target.value })}
+        />
 
-      <button onClick={addContact}>Agregar</button>
+        <button onClick={addContact}>Agregar</button>
+      </div>
 
       <hr />
 
-      {/* LISTA */}
+      {/* 🔹 LISTA DE CONTACTOS */}
       {contacts.map(contact => (
         <Contact
           key={contact.id}
